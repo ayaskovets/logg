@@ -22,11 +22,11 @@ include(GenerateExportHeader)
 generate_export_header(logg EXPORT_FILE_NAME
                        "${CMAKE_CURRENT_BINARY_DIR}/include/logg/export.hpp")
 
-set(SOURCES src/logger.cpp src/renderer.cpp src/writer.cpp)
+set(SOURCES src/renderer.cpp src/writer.cpp)
 set(HEADERS
     "${CMAKE_CURRENT_BINARY_DIR}/include/logg/export.hpp"
-    include/logg/level.hpp include/logg/logg.hpp include/logg/logger.hpp
-    include/logg/renderer.hpp include/logg/writer.hpp)
+    include/logg/level.hpp include/logg/logger.hpp include/logg/renderer.hpp
+    include/logg/writer.hpp)
 
 # ------------------------------------------------------------------------------
 # target
