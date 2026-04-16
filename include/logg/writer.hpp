@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdio>
 #include <functional>
 #include <ostream>
 #include <string_view>
@@ -15,7 +16,7 @@ class writer final {
   /**
    * @brief Make writer that does nothing with the string to be printed
    */
-  static auto kNoop() noexcept -> writer;
+  static auto kNull() noexcept -> writer;
 
   /**
    * @brief Make writer that prints to stdout
@@ -26,6 +27,11 @@ class writer final {
    * @brief Make writer that prints to stderr
    */
   static auto kStderr() noexcept -> writer;
+
+  /**
+   * @brief Make writer that writes to a C library file
+   */
+  static auto kFile(FILE * file) noexcept -> writer;
 
   /**
    * @brief Make writer that writes to a std::ostream instance

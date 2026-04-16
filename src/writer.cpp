@@ -7,13 +7,13 @@
 namespace logg {
 
 auto writer::kNull() noexcept -> writer {
-  write_t const write = [](std::string_view) {};
+  write_t write = [](std::string_view) {};
 
-  return writer(write);
+  return writer(std::move(write));
 }
 
 auto writer::kStdout() noexcept -> writer {
-  write_t const write = [](std::string_view log) {
+  write_t write = [](std::string_view log) {
     // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
     if (std::fputs(log.data(), stdout) == EOF) [[unlikely]] {
       throw std::runtime_error(
@@ -22,11 +22,11 @@ auto writer::kStdout() noexcept -> writer {
     }
   };
 
-  return writer(write);
+  return writer(std::move(write));
 }
 
 auto writer::kStderr() noexcept -> writer {
-  write_t const write = [](std::string_view log) {
+  write_t write = [](std::string_view log) {
     // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
     if (std::fputs(log.data(), stderr) == EOF) [[unlikely]] {
       throw std::runtime_error(
@@ -35,13 +35,26 @@ auto writer::kStderr() noexcept -> writer {
     }
   };
 
-  return writer(write);
+  return writer(std::move(write));
+}
+
+auto writer::kFile(FILE * file) noexcept -> writer {
+  write_t write = [file](std::string_view log) {
+    // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
+    if (std::fputs(log.data(), file) == EOF) [[unlikely]] {
+      throw std::runtime_error(
+          std::format("fputs({}) failed: {}", static_cast<void *>(file),
+                      std::generic_category().message(std::ferror(stderr))));
+    }
+  };
+
+  return writer(std::move(write));
 }
 
 auto writer::kStream(std::ostream & ostream) noexcept -> writer {
-  write_t const write = [&ostream](std::string_view log) { ostream << log; };
+  write_t write = [&ostream](std::string_view log) { ostream << log; };
 
-  return writer(write);
+  return writer(std::move(write));
 }
 
 }  // namespace logg
