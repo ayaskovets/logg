@@ -6,7 +6,7 @@
 
 namespace logg {
 
-auto writer::kNoop() noexcept -> writer {
+auto writer::kNull() noexcept -> writer {
   write_t const write = [](std::string_view) {};
 
   return writer(write);

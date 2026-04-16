@@ -27,8 +27,8 @@ TEST(writer, smoke) {
   EXPECT_EQ(buffer, "another log");
 }
 
-TEST(writer, noop) {
-  logg::writer const writer = logg::writer::kNoop();
+TEST(writer, null) {
+  logg::writer const writer = logg::writer::kNull();
 
   testing::internal::CaptureStdout();
   testing::internal::CaptureStderr();

@@ -39,9 +39,14 @@ constexpr auto kResetColor(level level) noexcept -> char const * {
 }  // namespace
 
 auto renderer::kNoop() noexcept -> renderer {
-  render_t constexpr render = [](std::string &, level, std::string_view,
-                                 std::format_args,
-                                 std::size_t) { return std::string_view(); };
+  render_t constexpr render = [](std::string & buffer, level,
+                                 std::string_view fmt, std::format_args args,
+                                 std::size_t) {
+    std::size_t const prefix_size = buffer.size();
+    std::vformat_to(std::back_inserter(buffer), fmt, args);
+
+    return std::string_view(buffer).substr(prefix_size);
+  };
 
   return renderer(render);
 }

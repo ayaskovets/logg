@@ -44,10 +44,10 @@ TEST(renderer, noop) {
 
   logg::renderer const renderer = logg::renderer::kNoop();
 
-  EXPECT_TRUE(renderer(buffer, logg::level::kDebug, "some log",
-                       std::make_format_args(), 0)
-                  .empty());
-  EXPECT_TRUE(buffer.empty());
+  EXPECT_EQ(renderer(buffer, logg::level::kDebug, "some log",
+                     std::make_format_args(), 0),
+            std::string_view("some log"));
+  EXPECT_EQ(buffer, std::string_view("some log"));
 }
 
 TEST(renderer, colored_leveled) {
