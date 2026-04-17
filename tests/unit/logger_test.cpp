@@ -6,9 +6,6 @@
 
 #include <gtest/gtest.h>
 
-#include "logg/renderer.hpp"
-#include "logg/writer.hpp"
-
 namespace tests::unit {
 
 TEST(logger, size) {
