@@ -48,14 +48,12 @@ class logger {
     }
   }
 
- protected:
-  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+ private:
   // NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members)
   level const level_;
   renderer const renderer_;
   writer const writer_;
   // NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
-  // NOLINTEND(misc-non-private-member-variables-in-classes)
 };
 
 }  // namespace logg

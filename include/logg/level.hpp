@@ -31,13 +31,13 @@ class std::formatter<logg::level> {
       -> decltype(auto) {
     switch (level) {
       case logg::level::kDebug:
-        return std::format_to(ctx.out(), "D");
+        return std::format_to(ctx.out(), "Debug");
       case logg::level::kInfo:
-        return std::format_to(ctx.out(), "I");
+        return std::format_to(ctx.out(), "Info");
       case logg::level::kWarn:
-        return std::format_to(ctx.out(), "W");
+        return std::format_to(ctx.out(), "Warn");
       case logg::level::kError:
-        return std::format_to(ctx.out(), "E");
+        return std::format_to(ctx.out(), "Error");
     }
   }
 };
