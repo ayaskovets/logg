@@ -10,8 +10,8 @@ namespace tests::unit {
 
 TEST(logger, size) {
   // NOLINTBEGIN(readability-magic-numbers)
-  static_assert(sizeof(logg::logger) == 48);
-  static_assert(alignof(logg::logger) == 8);
+  static_assert(sizeof(logg::logger<>) == 48);
+  static_assert(alignof(logg::logger<>) == 8);
   // NOLINTEND(readability-magic-numbers)
 }
 

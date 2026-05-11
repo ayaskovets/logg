@@ -42,7 +42,7 @@ class writer final {
   using write_t = std::function<void(std::string_view log)>;
 
  public:
-  constexpr explicit writer(write_t write) noexcept
+  explicit constexpr writer(write_t write) noexcept
       : write_(std::move(write)) {}
 
  public:

@@ -9,6 +9,7 @@ Checks: "*,
         -cppcoreguidelines-avoid-magic-numbers,
         -cppcoreguidelines-non-private-member-variables-in-classes,
         -altera-unroll-loops,
-        -hicpp-vararg"
+        -hicpp-vararg,
+        -readability-magic-numbers"
 FormatStyle: none
 WarningsAsErrors: "*"

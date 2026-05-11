@@ -1,9 +1,9 @@
 #pragma once
 
-#include <logg/level.hpp>
-
 #include <format>
 #include <string_view>
+
+#include "level.hpp"
 
 namespace logg {
 
@@ -42,7 +42,7 @@ class renderer final {
                                         std::size_t args_size);
 
  public:
-  constexpr explicit renderer(render_t render) noexcept : render_(render) {}
+  explicit constexpr renderer(render_t render) noexcept : render_(render) {}
 
  public:
   constexpr auto operator()(std::string & buffer, level level,

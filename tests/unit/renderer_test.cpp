@@ -55,24 +55,27 @@ TEST(renderer, colored_leveled) {
 
   EXPECT_EQ(renderer(buffer, logg::level::kDebug, "log #{}",
                      std::make_format_args("1"), 1),
-            std::string_view(("D\tlog #1\n")));
-  EXPECT_EQ(buffer, std::string_view("some prefixD\tlog #{}\nD\tlog #1\n"));
+            std::string_view(("Debug\tlog #1\n")));
+  EXPECT_EQ(buffer,
+            std::string_view("some prefixDebug\tlog #{}\nDebug\tlog #1\n"));
 
   EXPECT_EQ(renderer(buffer, logg::level::kInfo, "log #{}",
                      std::make_format_args("2"), 1),
-            std::string_view(("\x1B[32mI\x1B[0m\tlog #2\n")));
-  EXPECT_EQ(buffer,
-            std::string_view(
-                "some prefixD\tlog #{}\nD\tlog #1\n\x1B[32mI\x1B[0m\tlog "
-                "#{}\n\x1B[32mI\x1B[0m\tlog #2\n"));
+            std::string_view(("\x1B[32mInfo\x1B[0m\tlog #2\n")));
+  EXPECT_EQ(
+      buffer,
+      std::string_view(
+          "some prefixDebug\tlog #{}\nDebug\tlog #1\n\x1B[32mInfo\x1B[0m\tlog "
+          "#{}\n\x1B[32mInfo\x1B[0m\tlog #2\n"));
 
   EXPECT_EQ(renderer(buffer, logg::level::kDebug, "log #3",
                      std::make_format_args(), 0),
-            std::string_view(("D\tlog #3\n")));
-  EXPECT_EQ(buffer,
-            std::string_view(
-                "some prefixD\tlog #{}\nD\tlog #1\n\x1B[32mI\x1B[0m\tlog "
-                "#{}\n\x1B[32mI\x1B[0m\tlog #2\nD\tlog #3\n"));
+            std::string_view(("Debug\tlog #3\n")));
+  EXPECT_EQ(
+      buffer,
+      std::string_view(
+          "some prefixDebug\tlog #{}\nDebug\tlog #1\n\x1B[32mInfo\x1B[0m\tlog "
+          "#{}\n\x1B[32mInfo\x1B[0m\tlog #2\nDebug\tlog #3\n"));
 }
 
 }  // namespace tests
