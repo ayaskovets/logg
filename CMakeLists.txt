@@ -61,7 +61,7 @@ if(NOT BUILD_SHARED_LIBS)
   target_compile_definitions(logg PUBLIC LOGG_STATIC_DEFINE)
 endif()
 
-target_link_libraries(logg INTERFACE flow::flow)
+target_link_libraries(logg PUBLIC flow::flow)
 
 # ------------------------------------------------------------------------------
 # install
