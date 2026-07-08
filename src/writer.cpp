@@ -7,13 +7,13 @@
 namespace logg {
 
 auto writer::kNull() noexcept -> writer {
-  write_t write = [](std::string_view) {};
+  write_t write = [](std::string_view) -> void {};
 
   return writer(std::move(write));
 }
 
 auto writer::kStdout() noexcept -> writer {
-  write_t write = [](std::string_view log) {
+  write_t write = [](std::string_view log) -> void {
     // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
     if (std::fputs(log.data(), stdout) == EOF) [[unlikely]] {
       throw std::runtime_error(
@@ -26,7 +26,7 @@ auto writer::kStdout() noexcept -> writer {
 }
 
 auto writer::kStderr() noexcept -> writer {
-  write_t write = [](std::string_view log) {
+  write_t write = [](std::string_view log) -> void {
     // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
     if (std::fputs(log.data(), stderr) == EOF) [[unlikely]] {
       throw std::runtime_error(
@@ -39,7 +39,7 @@ auto writer::kStderr() noexcept -> writer {
 }
 
 auto writer::kFile(FILE * file) noexcept -> writer {
-  write_t write = [file](std::string_view log) {
+  write_t write = [file](std::string_view log) -> void {
     // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
     if (std::fputs(log.data(), file) == EOF) [[unlikely]] {
       throw std::runtime_error(
@@ -52,7 +52,7 @@ auto writer::kFile(FILE * file) noexcept -> writer {
 }
 
 auto writer::kStream(std::ostream & ostream) noexcept -> writer {
-  write_t write = [&ostream](std::string_view log) { ostream << log; };
+  write_t write = [&ostream](std::string_view log) -> void { ostream << log; };
 
   return writer(std::move(write));
 }

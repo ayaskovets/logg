@@ -8,7 +8,7 @@ namespace benchmarks {
 namespace {
 
 constexpr auto devnull() noexcept -> decltype(auto) {
-  return std::unique_ptr<FILE, decltype([](FILE * devnull) {
+  return std::unique_ptr<FILE, decltype([](FILE * devnull) -> void {
                            // NOLINTNEXTLINE(cert-err33-c,cppcoreguidelines-owning-memory)
                            std::fclose(devnull);
                          })>(std::fopen("/dev/null", "we"));

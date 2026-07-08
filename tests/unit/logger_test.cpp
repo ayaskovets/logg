@@ -21,7 +21,7 @@ TEST(logger, level_check) {
   auto const level = logg::level::kWarn;
   logg::renderer const renderer(logg::renderer::kNoop());
   logg::writer const writer(
-      [&logs_count](std::string_view) { logs_count += 1; });
+      [&logs_count](std::string_view) -> void { logs_count += 1; });
   logg::logger const logger(level, renderer, writer);
 
   logger(logg::level::kDebug, "");

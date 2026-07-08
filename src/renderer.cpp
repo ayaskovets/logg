@@ -41,7 +41,7 @@ constexpr auto kResetColor(level level) noexcept -> char const * {
 auto renderer::kNoop() noexcept -> renderer {
   render_t constexpr render = [](std::string & buffer, level,
                                  std::string_view fmt, std::format_args args,
-                                 std::size_t) {
+                                 std::size_t) -> std::string_view {
     std::size_t const prefix_size = buffer.size();
     std::vformat_to(std::back_inserter(buffer), fmt, args);
 
@@ -54,7 +54,7 @@ auto renderer::kNoop() noexcept -> renderer {
 auto renderer::kColoredLeveled() noexcept -> renderer {
   render_t constexpr render = [](std::string & buffer, level level,
                                  std::string_view fmt, std::format_args args,
-                                 std::size_t args_size) {
+                                 std::size_t args_size) -> std::string_view {
     std::size_t const prefix_size = buffer.size();
     std::format_to(std::back_inserter(buffer), "{}{}{}\t{}\n", kSetColor(level),
                    level, kResetColor(level), fmt);
@@ -76,7 +76,7 @@ auto renderer::kColoredLeveled() noexcept -> renderer {
 auto renderer::kColoredLeveledTimestamped() noexcept -> renderer {
   render_t constexpr render = [](std::string & buffer, level level,
                                  std::string_view fmt, std::format_args args,
-                                 std::size_t args_size) {
+                                 std::size_t args_size) -> std::string_view {
     std::size_t const prefix_size = buffer.size();
     std::format_to(std::back_inserter(buffer), "{:%FT%T%z}\t{}{}{}\t{}\n",
                    std::chrono::system_clock::now(), kSetColor(level), level,

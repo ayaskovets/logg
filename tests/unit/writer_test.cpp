@@ -18,7 +18,8 @@ TEST(writer, size) {
 TEST(writer, smoke) {
   std::string buffer;
 
-  logg::writer const writer([&buffer](std::string_view log) { buffer = log; });
+  logg::writer const writer(
+      [&buffer](std::string_view log) -> void { buffer = log; });
 
   writer("a log");
   EXPECT_EQ(buffer, "a log");
