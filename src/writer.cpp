@@ -17,7 +17,7 @@ auto writer::kStdout() noexcept -> writer {
     // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
     if (std::fputs(log.data(), stdout) == EOF) [[unlikely]] {
       throw std::runtime_error(
-          std::format("fputs(stdout) failed: {}",
+          std::format("writer::write_(): fputs(stdout) error {}",
                       std::generic_category().message(std::ferror(stdout))));
     }
   };
@@ -30,7 +30,7 @@ auto writer::kStderr() noexcept -> writer {
     // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
     if (std::fputs(log.data(), stderr) == EOF) [[unlikely]] {
       throw std::runtime_error(
-          std::format("fputs(stderr) failed: {}",
+          std::format("writer::write_(): fputs(stderr) error {}",
                       std::generic_category().message(std::ferror(stderr))));
     }
   };
@@ -42,9 +42,9 @@ auto writer::kFile(FILE * file) noexcept -> writer {
   write_t write = [file](std::string_view log) -> void {
     // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
     if (std::fputs(log.data(), file) == EOF) [[unlikely]] {
-      throw std::runtime_error(
-          std::format("fputs({}) failed: {}", static_cast<void *>(file),
-                      std::generic_category().message(std::ferror(stderr))));
+      throw std::runtime_error(std::format(
+          "writer::write_(): fputs({}) error {}", static_cast<void *>(file),
+          std::generic_category().message(std::ferror(stderr))));
     }
   };
 
