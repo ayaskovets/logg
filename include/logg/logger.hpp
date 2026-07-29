@@ -54,11 +54,9 @@ class logger {
   }
 
  private:
-  // NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members)
-  level const level_;
-  renderer const renderer_;
-  writer const writer_;
-  // NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
+  level level_;
+  renderer renderer_;
+  writer writer_;
 };
 
 }  // namespace logg

@@ -52,8 +52,7 @@ class renderer final {
   }
 
  private:
-  // NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members)
-  render_t const render_;
+  render_t render_;
 };
 
 }  // namespace logg

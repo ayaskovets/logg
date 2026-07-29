@@ -49,8 +49,7 @@ class writer final {
   constexpr void operator()(std::string_view log) const { write_(log); }
 
  private:
-  // NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members)
-  write_t const write_;
+  write_t write_;
 };
 
 }  // namespace logg
