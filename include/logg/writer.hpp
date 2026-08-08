@@ -14,12 +14,12 @@ namespace logg {
 class writer final {
  public:
   /**
-   * @brief Make writer that does nothing with the string to be printed
+   * @brief Make a writer that does nothing with the string to be printed
    */
   static auto kNull() noexcept -> writer;
 
   /**
-   * @brief Make writer that prints to stdout
+   * @brief Make a writer that prints to stdout
    */
   static auto kStdout() noexcept -> writer;
 
@@ -29,12 +29,12 @@ class writer final {
   static auto kStderr() noexcept -> writer;
 
   /**
-   * @brief Make writer that writes to a C library file
+   * @brief Make a writer that writes to a C library file
    */
   static auto kFile(FILE * file) noexcept -> writer;
 
   /**
-   * @brief Make writer that writes to a std::ostream instance
+   * @brief Make a writer that writes to a std::ostream instance
    */
   static auto kStream(std::ostream & ostream) noexcept -> writer;
 

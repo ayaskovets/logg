@@ -22,6 +22,13 @@ class renderer final {
   static auto kNoop() noexcept -> renderer;
 
   /**
+   * @brief Make a renderer that adds the level of a printed log at the
+   * beginning of the format string
+   * @note Newline is automatically appended at the end
+   */
+  static auto kLeveled() noexcept -> renderer;
+
+  /**
    * @brief Make a renderer that adds the colored level of a printed log at the
    * beginning of the format string
    * @note Newline is automatically appended at the end

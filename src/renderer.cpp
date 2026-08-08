@@ -51,6 +51,36 @@ auto renderer::kNoop() noexcept -> renderer {
   return renderer(render);
 }
 
+auto renderer::kLeveled() noexcept -> renderer {
+  render_t constexpr render = [](std::string & buffer, level level,
+                                 std::string_view fmt, std::format_args args,
+                                 std::size_t args_size) -> std::string_view {
+    std::size_t const prefix_size = buffer.size();
+    std::format_to(std::back_inserter(buffer), "{}\t{}\n", level, fmt);
+
+    /**
+     * @note This is an optimization for when there is no args since the format
+     * string would not contain any other templates
+     */
+    if (args_size == 0) [[unlikely]] {
+      return std::string_view(buffer).substr(prefix_size);
+    }
+
+    /**
+     * @note This is a bit tricky way of writing the updated format string and
+     * the final rendered string into the same buffer one after another
+     */
+    std::size_t const fmt_size = buffer.size() - prefix_size;
+    std::vformat_to(std::back_inserter(buffer),
+                    std::string_view(buffer).substr(prefix_size, fmt_size),
+                    args);
+
+    return std::string_view(buffer).substr(prefix_size + fmt_size);
+  };
+
+  return renderer(render);
+}
+
 auto renderer::kColoredLeveled() noexcept -> renderer {
   render_t constexpr render = [](std::string & buffer, level level,
                                  std::string_view fmt, std::format_args args,
@@ -59,15 +89,24 @@ auto renderer::kColoredLeveled() noexcept -> renderer {
     std::format_to(std::back_inserter(buffer), "{}{}{}\t{}\n", kSetColor(level),
                    level, kResetColor(level), fmt);
 
-    std::size_t const fmt_size = buffer.size() - prefix_size;
-    if (args_size > 0) [[likely]] {
-      std::vformat_to(std::back_inserter(buffer),
-                      std::string_view(buffer).substr(prefix_size, fmt_size),
-                      args);
-      return std::string_view(buffer).substr(prefix_size + fmt_size);
+    /**
+     * @note This is an optimization for when there is no args since the format
+     * string would not contain any other templates
+     */
+    if (args_size == 0) [[unlikely]] {
+      return std::string_view(buffer).substr(prefix_size);
     }
 
-    return std::string_view(buffer).substr(prefix_size);
+    /**
+     * @note This is a bit tricky way of writing the updated format string and
+     * the final rendered string into the same buffer one after another
+     */
+    std::size_t const fmt_size = buffer.size() - prefix_size;
+    std::vformat_to(std::back_inserter(buffer),
+                    std::string_view(buffer).substr(prefix_size, fmt_size),
+                    args);
+
+    return std::string_view(buffer).substr(prefix_size + fmt_size);
   };
 
   return renderer(render);
@@ -82,15 +121,24 @@ auto renderer::kColoredLeveledTimestamped() noexcept -> renderer {
                    std::chrono::system_clock::now(), kSetColor(level), level,
                    kResetColor(level), fmt);
 
-    std::size_t const fmt_size = buffer.size() - prefix_size;
-    if (args_size > 0) [[likely]] {
-      std::vformat_to(std::back_inserter(buffer),
-                      std::string_view(buffer).substr(prefix_size, fmt_size),
-                      args);
-      return std::string_view(buffer).substr(prefix_size + fmt_size);
+    /**
+     * @note This is an optimization for when there is no args since the format
+     * string would not contain any other templates
+     */
+    if (args_size == 0) [[unlikely]] {
+      return std::string_view(buffer).substr(prefix_size);
     }
 
-    return std::string_view(buffer).substr(prefix_size);
+    /**
+     * @note This is a bit tricky way of writing the updated format string and
+     * the final rendered string into the same buffer one after another
+     */
+    std::size_t const fmt_size = buffer.size() - prefix_size;
+    std::vformat_to(std::back_inserter(buffer),
+                    std::string_view(buffer).substr(prefix_size, fmt_size),
+                    args);
+
+    return std::string_view(buffer).substr(prefix_size + fmt_size);
   };
 
   return renderer(render);

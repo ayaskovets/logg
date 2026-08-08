@@ -15,9 +15,9 @@ auto writer::kNull() noexcept -> writer {
 auto writer::kStdout() noexcept -> writer {
   write_t write = [](std::string_view log) -> void {
     // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
-    if (std::fputs(log.data(), stdout) == EOF) [[unlikely]] {
+    if (std::fwrite(log.data(), log.size(), 1, stdout) != 1) [[unlikely]] {
       throw std::runtime_error(
-          std::format("writer::write_(): fputs(stdout) error {}",
+          std::format("writer::operator()(): fwrite(stdout) error {}",
                       std::generic_category().message(std::ferror(stdout))));
     }
   };
@@ -28,9 +28,9 @@ auto writer::kStdout() noexcept -> writer {
 auto writer::kStderr() noexcept -> writer {
   write_t write = [](std::string_view log) -> void {
     // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
-    if (std::fputs(log.data(), stderr) == EOF) [[unlikely]] {
+    if (std::fwrite(log.data(), log.size(), 1, stderr) != 1) [[unlikely]] {
       throw std::runtime_error(
-          std::format("writer::write_(): fputs(stderr) error {}",
+          std::format("writer::operator()(): fwrite(stderr) error {}",
                       std::generic_category().message(std::ferror(stderr))));
     }
   };
@@ -41,10 +41,11 @@ auto writer::kStderr() noexcept -> writer {
 auto writer::kFile(FILE * file) noexcept -> writer {
   write_t write = [file](std::string_view log) -> void {
     // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
-    if (std::fputs(log.data(), file) == EOF) [[unlikely]] {
-      throw std::runtime_error(std::format(
-          "writer::write_(): fputs({}) error {}", static_cast<void *>(file),
-          std::generic_category().message(std::ferror(stderr))));
+    if (std::fwrite(log.data(), log.size(), 1, file) != 1) [[unlikely]] {
+      throw std::runtime_error(
+          std::format("writer::operator()(): fwrite({}) error {}",
+                      static_cast<void *>(file),
+                      std::generic_category().message(std::ferror(file))));
     }
   };
 
