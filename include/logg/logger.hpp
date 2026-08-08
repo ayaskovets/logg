@@ -48,6 +48,9 @@ class logger {
                       sizeof...(Args)));
 
     if (buffer.size() > MaxBufferCapacity) [[unlikely]] {
+      /**
+       * @note Guaranteed way to free the underlying memory
+       */
       buffer = std::string();
       buffer.reserve(MinBufferCapacity);
     }
