@@ -11,6 +11,7 @@ Checks: "*,
         -altera-unroll-loops,
         -hicpp-vararg,
         -readability-magic-numbers,
-        -hicpp-move-const-arg"
+        -hicpp-move-const-arg,
+        -cppcoreguidelines-owning-memory"
 FormatStyle: none
 WarningsAsErrors: "*"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cstdio>
+#include <filesystem>
 #include <functional>
 #include <ostream>
 #include <string_view>
@@ -29,14 +29,15 @@ class writer final {
   static auto kStderr() noexcept -> writer;
 
   /**
-   * @brief Make a writer that writes to a C library file
-   */
-  static auto kFile(FILE * file) noexcept -> writer;
-
-  /**
    * @brief Make a writer that writes to a std::ostream instance
    */
   static auto kStream(std::ostream & ostream) noexcept -> writer;
+
+  /**
+   * @brief Make a writer that opens a file and writes to it
+   * @note Throws an exception in case file can not be opened
+   */
+  static auto kPath(std::filesystem::path const & path) -> writer;
 
  private:
   using write_t = std::function<void(std::string_view log)>;

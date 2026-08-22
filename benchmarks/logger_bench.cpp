@@ -17,9 +17,8 @@ constexpr auto devnull() noexcept -> decltype(auto) {
 }  // namespace
 
 constexpr void BM_logger_transparent(benchmark::State & state) noexcept {
-  auto const file = devnull();
   logg::logger const logger(logg::level::kDebug, logg::renderer::kNoop(),
-                            logg::writer::kFile(file.get()));
+                            logg::writer::kPath("/dev/null"));
 
   // NOLINTNEXTLINE(readability-identifier-length)
   for (auto const _ : state) {

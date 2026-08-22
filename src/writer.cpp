@@ -2,6 +2,7 @@
 
 #include <cstdio>
 #include <format>
+#include <fstream>
 #include <system_error>
 
 namespace logg {
@@ -38,22 +39,23 @@ auto writer::kStderr() noexcept -> writer {
   return writer(std::move(write));
 }
 
-auto writer::kFile(FILE * file) noexcept -> writer {
-  write_t write = [file](std::string_view log) -> void {
-    // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
-    if (std::fwrite(log.data(), log.size(), 1, file) != 1) [[unlikely]] {
-      throw std::runtime_error(
-          std::format("writer::operator()(): fwrite({}) error {}",
-                      static_cast<void *>(file),
-                      std::generic_category().message(std::ferror(file))));
-    }
-  };
+auto writer::kStream(std::ostream & ostream) noexcept -> writer {
+  write_t write = [&ostream](std::string_view log) -> void { ostream << log; };
 
   return writer(std::move(write));
 }
 
-auto writer::kStream(std::ostream & ostream) noexcept -> writer {
-  write_t write = [&ostream](std::string_view log) -> void { ostream << log; };
+auto writer::kPath(std::filesystem::path const & path) -> writer {
+  auto ostream = std::make_shared<std::ofstream>(path.c_str(),
+                                                 std::ios::out | std::ios::app);
+  if (!ostream || ostream->is_open()) {
+    throw std::runtime_error("writer::writer(): could not open file");
+  }
+
+  write_t write =
+      [ostream = std::move(ostream)](std::string_view log) mutable -> void {
+    *ostream << log;
+  };
 
   return writer(std::move(write));
 }
