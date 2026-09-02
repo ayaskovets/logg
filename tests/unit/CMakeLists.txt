@@ -24,7 +24,7 @@ add_executable(logg-unit-tests)
 # sources
 # ------------------------------------------------------------------------------
 
-set(SOURCES logger_test.cpp renderer_test.cpp writer_test.cpp)
+set(SOURCES buffer_test.cpp logger_test.cpp renderer_test.cpp writer_test.cpp)
 
 # ------------------------------------------------------------------------------
 # target
