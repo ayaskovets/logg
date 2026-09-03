@@ -38,23 +38,23 @@ constexpr auto kResetColor(level level) noexcept -> char const * {
 
 }  // namespace
 
-auto renderer::kNoop() noexcept -> renderer {
-  render_t constexpr render = [](std::string & buffer, level,
-                                 std::string_view fmt, std::format_args args,
-                                 std::size_t) -> std::string_view {
+auto renderer::kNoop(buffer buffer) noexcept -> renderer {
+  render_t constexpr render = [](std::string_view fmt, std::format_args args,
+                                 std::size_t, level,
+                                 std::string & buffer) -> std::string_view {
     std::size_t const prefix_size = buffer.size();
     std::vformat_to(std::back_inserter(buffer), fmt, args);
 
     return std::string_view(buffer).substr(prefix_size);
   };
 
-  return renderer(render);
+  return renderer(render, std::move(buffer));
 }
 
-auto renderer::kLeveled() noexcept -> renderer {
-  render_t constexpr render = [](std::string & buffer, level level,
-                                 std::string_view fmt, std::format_args args,
-                                 std::size_t args_size) -> std::string_view {
+auto renderer::kLeveled(buffer buffer) noexcept -> renderer {
+  render_t constexpr render = [](std::string_view fmt, std::format_args args,
+                                 std::size_t args_size, level level,
+                                 std::string & buffer) -> std::string_view {
     std::size_t const prefix_size = buffer.size();
     std::format_to(std::back_inserter(buffer), "{}\t{}\n", level, fmt);
 
@@ -78,13 +78,13 @@ auto renderer::kLeveled() noexcept -> renderer {
     return std::string_view(buffer).substr(prefix_size + fmt_size);
   };
 
-  return renderer(render);
+  return renderer(render, std::move(buffer));
 }
 
-auto renderer::kColoredLeveled() noexcept -> renderer {
-  render_t constexpr render = [](std::string & buffer, level level,
-                                 std::string_view fmt, std::format_args args,
-                                 std::size_t args_size) -> std::string_view {
+auto renderer::kColoredLeveled(buffer buffer) noexcept -> renderer {
+  render_t constexpr render = [](std::string_view fmt, std::format_args args,
+                                 std::size_t args_size, level level,
+                                 std::string & buffer) -> std::string_view {
     std::size_t const prefix_size = buffer.size();
     std::format_to(std::back_inserter(buffer), "{}{}{}\t{}\n", kSetColor(level),
                    level, kResetColor(level), fmt);
@@ -109,13 +109,13 @@ auto renderer::kColoredLeveled() noexcept -> renderer {
     return std::string_view(buffer).substr(prefix_size + fmt_size);
   };
 
-  return renderer(render);
+  return renderer(render, std::move(buffer));
 }
 
-auto renderer::kColoredLeveledTimestamped() noexcept -> renderer {
-  render_t constexpr render = [](std::string & buffer, level level,
-                                 std::string_view fmt, std::format_args args,
-                                 std::size_t args_size) -> std::string_view {
+auto renderer::kColoredLeveledTimestamped(buffer buffer) noexcept -> renderer {
+  render_t constexpr render = [](std::string_view fmt, std::format_args args,
+                                 std::size_t args_size, level level,
+                                 std::string & buffer) -> std::string_view {
     std::size_t const prefix_size = buffer.size();
     std::format_to(std::back_inserter(buffer), "{:%FT%T%z}\t{}{}{}\t{}\n",
                    std::chrono::system_clock::now(), kSetColor(level), level,
@@ -141,7 +141,7 @@ auto renderer::kColoredLeveledTimestamped() noexcept -> renderer {
     return std::string_view(buffer).substr(prefix_size + fmt_size);
   };
 
-  return renderer(render);
+  return renderer(render, std::move(buffer));
 }
 
 }  // namespace logg

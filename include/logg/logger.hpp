@@ -11,48 +11,23 @@ namespace logg {
 
 /**
  * @brief Logger with customizable string rendering and destination
- * @note Log level is immutable. The logger is generally thread-safe, but this
- * is dependent on the implementation of the writer
- * @note Underlying TLS buffer size always stays in range [MaxBufferCapacity,
- * MinBufferCapacity] after any single log but can be temporarily resized by the
- * renderer
+ * @note Log level is immutable. Thread safety is decided by the renderer and
+ * writer implementations
  */
-// NOLINTNEXTBEGIN(cppcoreguidelines-avoid-magic-numbers)
-template <std::size_t MaxBufferCapacity = 4096,
-          std::size_t MinBufferCapacity = 1024>
-// NOLINTNEXTEND(cppcoreguidelines-avoid-magic-numbers)
 class logger {
- private:
-  /**
-   * @note Underlying TLS buffer size always stays in range
-   * [kMinimumBufferCapacity, kMaximumBufferCapacity] after any single log but
-   * can be temporarily resized by the renderer
-   */
-
  public:
   constexpr logger(level level, renderer renderer, writer writer) noexcept
-      : level_(level), renderer_(renderer), writer_(std::move(writer)) {}
+      : level_(level),
+        renderer_(std::move(renderer)),
+        writer_(std::move(writer)) {}
 
  public:
   template <typename... Args>
   constexpr void operator()(level level, std::format_string<Args...> fmt,
                             Args const &... args) const {
-    if (level_ > level) {
-      return;
-    }
-
-    thread_local std::string buffer(MinBufferCapacity, ' ');
-    buffer.clear();
-
-    writer_(renderer_(buffer, level, fmt.get(), std::make_format_args(args...),
-                      sizeof...(Args)));
-
-    if (buffer.size() > MaxBufferCapacity) [[unlikely]] {
-      /**
-       * @note Guaranteed way to free the underlying memory
-       */
-      buffer = std::string();
-      buffer.reserve(MinBufferCapacity);
+    if (level_ <= level) {
+      writer_(renderer_(fmt.get(), std::make_format_args(args...),
+                        sizeof...(Args), level));
     }
   }
 

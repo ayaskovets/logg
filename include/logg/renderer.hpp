@@ -3,15 +3,14 @@
 #include <format>
 #include <string_view>
 
+#include "buffer.hpp"
 #include "level.hpp"
 
 namespace logg {
 
 /**
  * @brief Log message decorator and formatter. Responsible for rendering format
- * string and arguments into a string buffer
- * @note The rendering function is free to use the buffer anyhow but is required
- * to return a view containing the formatted message
+ * string using the provided arguments
  */
 class renderer final {
  public:
@@ -19,47 +18,49 @@ class renderer final {
    * @brief Make a no-op renderer which works transparently and does not affect
    * the format string in any way
    */
-  static auto kNoop() noexcept -> renderer;
+  static auto kNoop(buffer buffer) noexcept -> renderer;
 
   /**
    * @brief Make a renderer that adds the level of a printed log at the
    * beginning of the format string
    * @note Newline is automatically appended at the end
    */
-  static auto kLeveled() noexcept -> renderer;
+  static auto kLeveled(buffer buffer) noexcept -> renderer;
 
   /**
    * @brief Make a renderer that adds the colored level of a printed log at the
    * beginning of the format string
    * @note Newline is automatically appended at the end
    */
-  static auto kColoredLeveled() noexcept -> renderer;
+  static auto kColoredLeveled(buffer buffer) noexcept -> renderer;
 
   /**
    * @brief Make a renderer that adds the colored level of a printed log and
    * current system_clock timestamp at the beginning of the format string
    * @note Newline is automatically appended at the end
    */
-  static auto kColoredLeveledTimestamped() noexcept -> renderer;
+  static auto kColoredLeveledTimestamped(buffer buffer) noexcept -> renderer;
 
  private:
-  using render_t = std::string_view (*)(std::string & buffer, level level,
-                                        std::string_view fmt,
+  using render_t = std::string_view (*)(std::string_view fmt,
                                         std::format_args args,
-                                        std::size_t args_size);
+                                        std::size_t args_size, level level,
+                                        std::string & buffer);
 
  public:
-  explicit constexpr renderer(render_t render) noexcept : render_(render) {}
+  explicit constexpr renderer(render_t render, buffer buffer) noexcept
+      : render_(render), buffer_(std::move(buffer)) {}
 
  public:
-  constexpr auto operator()(std::string & buffer, level level,
-                            std::string_view fmt, std::format_args args,
-                            std::size_t args_size) const -> std::string_view {
-    return render_(buffer, level, fmt, args, args_size);
+  constexpr auto operator()(std::string_view fmt, std::format_args args,
+                            std::size_t args_size, level level) const
+      -> std::string_view {
+    return render_(fmt, args, args_size, level, buffer_.reset());
   }
 
  private:
   render_t render_;
+  mutable buffer buffer_;
 };
 
 }  // namespace logg

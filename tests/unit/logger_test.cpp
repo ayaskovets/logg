@@ -10,8 +10,8 @@ namespace tests::unit {
 
 TEST(logger, size) {
   // NOLINTBEGIN(readability-magic-numbers)
-  static_assert(sizeof(logg::logger<>) == 48);
-  static_assert(alignof(logg::logger<>) == 8);
+  static_assert(sizeof(logg::logger) == 104);
+  static_assert(alignof(logg::logger) == 8);
   // NOLINTEND(readability-magic-numbers)
 }
 
@@ -19,7 +19,8 @@ TEST(logger, level_check) {
   std::size_t logs_count = 0;
 
   auto const level = logg::level::kWarn;
-  logg::renderer const renderer(logg::renderer::kNoop());
+  logg::renderer const renderer(logg::renderer::kNoop(
+      logg::buffer::kLocal(std::array<std::size_t, 2>{24, 24})));
   logg::writer const writer(
       [&logs_count](std::string_view) -> void { logs_count += 1; });
   logg::logger const logger(level, renderer, writer);
@@ -41,7 +42,8 @@ TEST(logger, buffer_resizing) {
   std::ostringstream oss;
 
   auto const level = logg::level::kDebug;
-  logg::renderer const renderer(logg::renderer::kNoop());
+  logg::renderer const renderer(logg::renderer::kNoop(
+      logg::buffer::kLocal(std::array<std::size_t, 2>{24, 24})));
   logg::writer const writer(logg::writer::kStream(oss));
   logg::logger const logger(level, renderer, writer);
 

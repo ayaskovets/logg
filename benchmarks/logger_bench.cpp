@@ -17,7 +17,9 @@ constexpr auto devnull() noexcept -> decltype(auto) {
 }  // namespace
 
 constexpr void BM_logger_transparent(benchmark::State & state) noexcept {
-  logg::logger const logger(logg::level::kDebug, logg::renderer::kNoop(),
+  logg::logger const logger(logg::level::kDebug,
+                            logg::renderer::kNoop(logg::buffer::kLocal(
+                                std::array<std::size_t, 2>{8, 16})),
                             logg::writer::kPath("/dev/null"));
 
   // NOLINTNEXTLINE(readability-identifier-length)
