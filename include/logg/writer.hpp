@@ -40,17 +40,17 @@ class writer final {
   static auto kPath(std::filesystem::path const & path) -> writer;
 
  private:
-  using write_t = std::function<void(std::string_view log)>;
+  using write_type = std::function<void(std::string_view log)>;
 
  public:
-  explicit constexpr writer(write_t write) noexcept
+  explicit constexpr writer(write_type write) noexcept
       : write_(std::move(write)) {}
 
  public:
   constexpr void operator()(std::string_view log) const { write_(log); }
 
  private:
-  write_t write_;
+  write_type write_;
 };
 
 }  // namespace logg

@@ -16,7 +16,7 @@ auto buffer::kThreadLocal() noexcept -> buffer {
   return buffer(&impl);
 }
 
-auto buffer::kLocal(bounds_t bounds) noexcept -> buffer {
+auto buffer::kLocal(bounds_type bounds) noexcept -> buffer {
   impl impl({}, bounds);
   return buffer(std::move(impl));
 }
@@ -40,7 +40,7 @@ auto buffer::reset() -> std::string & {
   return storage;
 }
 
-void buffer::set_bounds(buffer::bounds_t bounds) {
+void buffer::set_bounds(buffer::bounds_type bounds) {
   auto & [storage, current_bounds] = visit();
 
   current_bounds = bounds;

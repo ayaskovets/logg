@@ -42,13 +42,13 @@ class renderer final {
   static auto kColoredLeveledTimestamped(buffer buffer) noexcept -> renderer;
 
  private:
-  using render_t = std::string_view (*)(std::string_view fmt,
-                                        std::format_args args,
-                                        std::size_t args_size, level level,
-                                        std::string & buffer);
+  using render_type = std::string_view (*)(std::string_view fmt,
+                                           std::format_args args,
+                                           std::size_t args_size, level level,
+                                           std::string & buffer);
 
  public:
-  explicit constexpr renderer(render_t render, buffer buffer) noexcept
+  explicit constexpr renderer(render_type render, buffer buffer) noexcept
       : render_(render), buffer_(std::move(buffer)) {}
 
  public:
@@ -59,7 +59,7 @@ class renderer final {
   }
 
  private:
-  render_t render_;
+  render_type render_;
   mutable buffer buffer_;
 };
 

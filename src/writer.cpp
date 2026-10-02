@@ -8,13 +8,13 @@
 namespace logg {
 
 auto writer::kNull() noexcept -> writer {
-  write_t write = [](std::string_view) -> void {};
+  write_type write = [](std::string_view) -> void {};
 
   return writer(std::move(write));
 }
 
 auto writer::kStdout() noexcept -> writer {
-  write_t write = [](std::string_view log) -> void {
+  write_type write = [](std::string_view log) -> void {
     // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
     if (std::fwrite(log.data(), log.size(), 1, stdout) != 1) [[unlikely]] {
       throw std::runtime_error(
@@ -27,7 +27,7 @@ auto writer::kStdout() noexcept -> writer {
 }
 
 auto writer::kStderr() noexcept -> writer {
-  write_t write = [](std::string_view log) -> void {
+  write_type write = [](std::string_view log) -> void {
     // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
     if (std::fwrite(log.data(), log.size(), 1, stderr) != 1) [[unlikely]] {
       throw std::runtime_error(
@@ -40,7 +40,9 @@ auto writer::kStderr() noexcept -> writer {
 }
 
 auto writer::kStream(std::ostream & ostream) noexcept -> writer {
-  write_t write = [&ostream](std::string_view log) -> void { ostream << log; };
+  write_type write = [&ostream](std::string_view log) -> void {
+    ostream << log;
+  };
 
   return writer(std::move(write));
 }
@@ -52,7 +54,7 @@ auto writer::kPath(std::filesystem::path const & path) -> writer {
     throw std::runtime_error("writer::writer(): could not open file");
   }
 
-  write_t write =
+  write_type write =
       [ostream = std::move(ostream)](std::string_view log) mutable -> void {
     *ostream << log;
   };

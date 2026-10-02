@@ -14,7 +14,7 @@ namespace logg {
  */
 class buffer final {
  private:
-  using bounds_t = swiss::frozen_flat_set<std::size_t, 2>;
+  using bounds_type = swiss::frozen_flat_set<std::size_t, 2>;
 
  public:
   /**
@@ -32,7 +32,7 @@ class buffer final {
    * @brief Make a buffer that holds a dedicated memory chunk for the created
    * object
    */
-  static auto kLocal(bounds_t bounds) noexcept -> buffer;
+  static auto kLocal(bounds_type bounds) noexcept -> buffer;
 
  public:
   /**
@@ -45,10 +45,10 @@ class buffer final {
    * @brief Set buffer [min, max] bounds
    * @note Can reallocate memory
    */
-  void set_bounds(bounds_t bounds);
+  void set_bounds(bounds_type bounds);
 
  private:
-  using impl = std::pair<std::string, bounds_t>;
+  using impl = std::pair<std::string, bounds_type>;
 
  private:
   explicit buffer(impl && local);

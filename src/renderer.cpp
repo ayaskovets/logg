@@ -39,9 +39,9 @@ constexpr auto kResetColor(level level) noexcept -> char const * {
 }  // namespace
 
 auto renderer::kNoop(buffer buffer) noexcept -> renderer {
-  render_t constexpr render = [](std::string_view fmt, std::format_args args,
-                                 std::size_t, level,
-                                 std::string & buffer) -> std::string_view {
+  render_type constexpr render = [](std::string_view fmt, std::format_args args,
+                                    std::size_t, level,
+                                    std::string & buffer) -> std::string_view {
     std::size_t const prefix_size = buffer.size();
     std::vformat_to(std::back_inserter(buffer), fmt, args);
 
@@ -52,9 +52,9 @@ auto renderer::kNoop(buffer buffer) noexcept -> renderer {
 }
 
 auto renderer::kLeveled(buffer buffer) noexcept -> renderer {
-  render_t constexpr render = [](std::string_view fmt, std::format_args args,
-                                 std::size_t args_size, level level,
-                                 std::string & buffer) -> std::string_view {
+  render_type constexpr render = [](std::string_view fmt, std::format_args args,
+                                    std::size_t args_size, level level,
+                                    std::string & buffer) -> std::string_view {
     std::size_t const prefix_size = buffer.size();
     std::format_to(std::back_inserter(buffer), "{}\t{}\n", level, fmt);
 
@@ -82,9 +82,9 @@ auto renderer::kLeveled(buffer buffer) noexcept -> renderer {
 }
 
 auto renderer::kColoredLeveled(buffer buffer) noexcept -> renderer {
-  render_t constexpr render = [](std::string_view fmt, std::format_args args,
-                                 std::size_t args_size, level level,
-                                 std::string & buffer) -> std::string_view {
+  render_type constexpr render = [](std::string_view fmt, std::format_args args,
+                                    std::size_t args_size, level level,
+                                    std::string & buffer) -> std::string_view {
     std::size_t const prefix_size = buffer.size();
     std::format_to(std::back_inserter(buffer), "{}{}{}\t{}\n", kSetColor(level),
                    level, kResetColor(level), fmt);
@@ -113,9 +113,9 @@ auto renderer::kColoredLeveled(buffer buffer) noexcept -> renderer {
 }
 
 auto renderer::kColoredLeveledTimestamped(buffer buffer) noexcept -> renderer {
-  render_t constexpr render = [](std::string_view fmt, std::format_args args,
-                                 std::size_t args_size, level level,
-                                 std::string & buffer) -> std::string_view {
+  render_type constexpr render = [](std::string_view fmt, std::format_args args,
+                                    std::size_t args_size, level level,
+                                    std::string & buffer) -> std::string_view {
     std::size_t const prefix_size = buffer.size();
     std::format_to(std::back_inserter(buffer), "{:%FT%T%z}\t{}{}{}\t{}\n",
                    std::chrono::system_clock::now(), kSetColor(level), level,
