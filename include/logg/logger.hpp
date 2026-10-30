@@ -26,8 +26,7 @@ class logger {
   constexpr void operator()(level level, std::format_string<Args...> fmt,
                             Args const &... args) const {
     if (level_ <= level) {
-      writer_(renderer_(fmt.get(), std::make_format_args(args...),
-                        sizeof...(Args), level));
+      writer_(renderer_(fmt.get(), std::make_format_args(args...), level));
     }
   }
 

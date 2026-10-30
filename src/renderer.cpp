@@ -1,6 +1,7 @@
 #include <logg/renderer.hpp>
 
 #include <chrono>
+#include <iterator>
 #include <string_view>
 
 namespace logg {
@@ -40,10 +41,10 @@ constexpr auto kResetColor(level level) noexcept -> char const * {
 
 auto renderer::kNoop(buffer buffer) noexcept -> renderer {
   render_type constexpr render = [](std::string_view fmt, std::format_args args,
-                                    std::size_t, level,
+                                    level,
                                     std::string & buffer) -> std::string_view {
     std::size_t const prefix_size = buffer.size();
-    std::vformat_to(std::back_inserter(buffer), fmt, args);
+    std::vformat_to(std::inserter(buffer, buffer.end()), fmt, args);
 
     return std::string_view(buffer).substr(prefix_size);
   };
@@ -53,29 +54,14 @@ auto renderer::kNoop(buffer buffer) noexcept -> renderer {
 
 auto renderer::kLeveled(buffer buffer) noexcept -> renderer {
   render_type constexpr render = [](std::string_view fmt, std::format_args args,
-                                    std::size_t args_size, level level,
+                                    level level,
                                     std::string & buffer) -> std::string_view {
     std::size_t const prefix_size = buffer.size();
-    std::format_to(std::back_inserter(buffer), "{}\t{}\n", level, fmt);
+    std::format_to(std::back_inserter(buffer), "{}\t", level);
+    std::vformat_to(std::inserter(buffer, buffer.end()), fmt, args);
+    buffer.push_back('\n');
 
-    /**
-     * @note This is an optimization for when there is no args since the format
-     * string would not contain any other templates
-     */
-    if (args_size == 0) [[unlikely]] {
-      return std::string_view(buffer).substr(prefix_size);
-    }
-
-    /**
-     * @note This is a bit tricky way of writing the updated format string and
-     * the final rendered string into the same buffer one after another
-     */
-    std::size_t const fmt_size = buffer.size() - prefix_size;
-    std::vformat_to(std::back_inserter(buffer),
-                    std::string_view(buffer).substr(prefix_size, fmt_size),
-                    args);
-
-    return std::string_view(buffer).substr(prefix_size + fmt_size);
+    return std::string_view(buffer).substr(prefix_size);
   };
 
   return renderer(render, std::move(buffer));
@@ -83,30 +69,15 @@ auto renderer::kLeveled(buffer buffer) noexcept -> renderer {
 
 auto renderer::kColoredLeveled(buffer buffer) noexcept -> renderer {
   render_type constexpr render = [](std::string_view fmt, std::format_args args,
-                                    std::size_t args_size, level level,
+                                    level level,
                                     std::string & buffer) -> std::string_view {
     std::size_t const prefix_size = buffer.size();
-    std::format_to(std::back_inserter(buffer), "{}{}{}\t{}\n", kSetColor(level),
-                   level, kResetColor(level), fmt);
+    std::format_to(std::back_inserter(buffer), "{}{}{}\t", kSetColor(level),
+                   level, kResetColor(level));
+    std::vformat_to(std::inserter(buffer, buffer.end()), fmt, args);
+    buffer.push_back('\n');
 
-    /**
-     * @note This is an optimization for when there is no args since the format
-     * string would not contain any other templates
-     */
-    if (args_size == 0) [[unlikely]] {
-      return std::string_view(buffer).substr(prefix_size);
-    }
-
-    /**
-     * @note This is a bit tricky way of writing the updated format string and
-     * the final rendered string into the same buffer one after another
-     */
-    std::size_t const fmt_size = buffer.size() - prefix_size;
-    std::vformat_to(std::back_inserter(buffer),
-                    std::string_view(buffer).substr(prefix_size, fmt_size),
-                    args);
-
-    return std::string_view(buffer).substr(prefix_size + fmt_size);
+    return std::string_view(buffer).substr(prefix_size);
   };
 
   return renderer(render, std::move(buffer));
@@ -114,31 +85,16 @@ auto renderer::kColoredLeveled(buffer buffer) noexcept -> renderer {
 
 auto renderer::kColoredLeveledTimestamped(buffer buffer) noexcept -> renderer {
   render_type constexpr render = [](std::string_view fmt, std::format_args args,
-                                    std::size_t args_size, level level,
+                                    level level,
                                     std::string & buffer) -> std::string_view {
     std::size_t const prefix_size = buffer.size();
-    std::format_to(std::back_inserter(buffer), "{:%FT%T%z}\t{}{}{}\t{}\n",
+    std::format_to(std::back_inserter(buffer), "{:%FT%T%z}\t{}{}{}\t",
                    std::chrono::system_clock::now(), kSetColor(level), level,
-                   kResetColor(level), fmt);
+                   kResetColor(level));
+    std::vformat_to(std::inserter(buffer, buffer.end()), fmt, args);
+    buffer.push_back('\n');
 
-    /**
-     * @note This is an optimization for when there is no args since the format
-     * string would not contain any other templates
-     */
-    if (args_size == 0) [[unlikely]] {
-      return std::string_view(buffer).substr(prefix_size);
-    }
-
-    /**
-     * @note This is a bit tricky way of writing the updated format string and
-     * the final rendered string into the same buffer one after another
-     */
-    std::size_t const fmt_size = buffer.size() - prefix_size;
-    std::vformat_to(std::back_inserter(buffer),
-                    std::string_view(buffer).substr(prefix_size, fmt_size),
-                    args);
-
-    return std::string_view(buffer).substr(prefix_size + fmt_size);
+    return std::string_view(buffer).substr(prefix_size);
   };
 
   return renderer(render, std::move(buffer));

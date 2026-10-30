@@ -72,4 +72,24 @@ TEST(buffer, tls_instance) {
   });
 }
 
+TEST(buffer, tls_affinity) {
+  auto buffer = logg::buffer::kThreadLocal();
+  auto & data = buffer.reset();
+  data        = "outer";
+
+  auto tls_buffer = logg::buffer::kThreadLocal();
+  {
+    std::jthread const thread([&buffer, &data, &tls_buffer]() noexcept -> void {
+      auto & thread_data = buffer.reset();
+      EXPECT_NE(&thread_data, &data);
+      EXPECT_EQ(&thread_data, &logg::buffer::kThreadLocal().reset());
+      thread_data = "inner";
+      tls_buffer  = logg::buffer::kThreadLocal();
+    });
+  }
+
+  EXPECT_EQ(data, "outer");
+  EXPECT_EQ(&tls_buffer.reset(), &data);
+}
+
 }  // namespace tests

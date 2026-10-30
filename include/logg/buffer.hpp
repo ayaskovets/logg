@@ -49,16 +49,17 @@ class buffer final {
 
  private:
   using impl = std::pair<std::string, bounds_type>;
+  enum class shared_storage : std::uint8_t { kStatic, kThreadLocal };
 
  private:
   explicit buffer(impl && local);
-  explicit buffer(impl * shared) noexcept;
+  explicit buffer(shared_storage shared) noexcept;
 
  private:
   auto visit() noexcept -> impl &;
 
  private:
-  std::variant<impl, impl *> local_or_shared_data_;
+  std::variant<impl, shared_storage> local_or_shared_data_;
 };
 
 }  // namespace logg

@@ -7,13 +7,11 @@
 namespace logg {
 
 auto buffer::kStatic() noexcept -> buffer {
-  static impl impl({}, std::array<std::size_t, 2>{});
-  return buffer(&impl);
+  return buffer(shared_storage::kStatic);
 }
 
 auto buffer::kThreadLocal() noexcept -> buffer {
-  thread_local impl impl({}, std::array<std::size_t, 2>{});
-  return buffer(&impl);
+  return buffer(shared_storage::kThreadLocal);
 }
 
 auto buffer::kLocal(bounds_type bounds) noexcept -> buffer {
@@ -46,17 +44,10 @@ void buffer::set_bounds(buffer::bounds_type bounds) {
   current_bounds = bounds;
 }
 
-buffer::buffer(impl && local) : local_or_shared_data_(std::move(local)) {
-  // NOLINTNEXTLINE(readability-identifier-length)
-  auto & [_, bounds] = visit();
-  set_bounds(bounds);
-}
+buffer::buffer(impl && local) : local_or_shared_data_(std::move(local)) {}
 
-buffer::buffer(impl * shared) noexcept : local_or_shared_data_(shared) {
-  // NOLINTNEXTLINE(readability-identifier-length)
-  auto & [_, bounds] = visit();
-  set_bounds(bounds);
-}
+buffer::buffer(shared_storage shared) noexcept
+    : local_or_shared_data_(shared) {}
 
 auto buffer::visit() noexcept -> impl & {
   return std::visit(
@@ -64,8 +55,14 @@ auto buffer::visit() noexcept -> impl & {
           [](buffer::impl & local_data) noexcept -> buffer::impl & {
             return local_data;
           },
-          [](buffer::impl * shared_data) noexcept -> buffer::impl & {
-            return *shared_data;
+          [](shared_storage shared) noexcept -> buffer::impl & {
+            if (shared == shared_storage::kStatic) {
+              static impl data({}, std::array<std::size_t, 2>{});
+              return data;
+            }
+
+            thread_local impl data({}, std::array<std::size_t, 2>{});
+            return data;
           }),
       local_or_shared_data_);
 }

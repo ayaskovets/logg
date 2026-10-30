@@ -44,8 +44,7 @@ class renderer final {
  private:
   using render_type = std::string_view (*)(std::string_view fmt,
                                            std::format_args args,
-                                           std::size_t args_size, level level,
-                                           std::string & buffer);
+                                           level level, std::string & buffer);
 
  public:
   explicit constexpr renderer(render_type render, buffer buffer) noexcept
@@ -53,9 +52,9 @@ class renderer final {
 
  public:
   constexpr auto operator()(std::string_view fmt, std::format_args args,
-                            std::size_t args_size, level level) const
+                            level level) const
       -> std::string_view {
-    return render_(fmt, args, args_size, level, buffer_.reset());
+    return render_(fmt, args, level, buffer_.reset());
   }
 
  private:
